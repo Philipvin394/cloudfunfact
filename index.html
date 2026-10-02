@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Cloud Fun Facts Generator</title>
+  <style>
+    :root {
+      --bg: #181a1b;
+      --card: #23272b;
+      --accent: #38bdf8;
+      --text: #f3f4f6;
+      --button-bg: #38bdf8;
+      --button-text: #181a1b;
+      --button-hover: #60d1ff;
+      --shadow: 0 4px 24px rgba(30,35,40,0.3);
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      margin: 0;
+    }
+
+    .card {
+      background: var(--card);
+      color: var(--text);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 2.5rem 2rem 2rem 2rem;
+      width: 360px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.85rem;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    #fact {
+      min-height: 40px;
+      text-align: center;
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    button {
+      background: var(--button-bg);
+      color: var(--button-text);
+      font-size: 1.02rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 7px;
+      padding: 0.85rem 1.6rem;
+      cursor: pointer;
+      transition: background 0.18s;
+      box-shadow: 0 2px 8px rgba(60,180,250,0.13);
+      margin-top: 0.5rem;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      background: #335c6e;
+    }
+
+    button:hover:enabled {
+      background: var(--button-hover);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Cloud Fun Facts Generator</h1>
+    <div id="fact">Click below to get a cloud fun fact!</div>
+    <button id="generate-btn">Get Fun Fact</button>
+  </div>
+  <script>
+    // Replace this URL with your API Gateway endpoint:
+    const API_ENDPOINT = 'https://your-api-gateway-url.amazonaws.com/cloud-facts';
+
+    const factEl = document.getElementById('fact');
+    const btn = document.getElementById('generate-btn');
+
+    async function fetchFunFact() {
+      factEl.textContent = 'Fetching fun fact...';
+      btn.disabled = true;
+      try {
+        const res = await fetch(API_ENDPOINT, { method: 'GET' });
+        if (res.ok) {
+          const data = await res.json();
+          // Adjust property if your API response structure differs
+          factEl.textContent = data.fact || 'No fact found.';
+        } else {
+          factEl.textContent = 'Failed to fetch fact. Try again!';
+        }
+      } catch (err) {
+        factEl.textContent = 'Could not connect to API.';
+      }
+      btn.disabled = false;
+    }
+
+    btn.addEventListener('click', fetchFunFact);
+  </script>
+</body>
+</html>
