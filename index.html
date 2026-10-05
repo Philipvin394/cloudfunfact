@@ -88,7 +88,7 @@
   </div>
   <script>
     // Replace this URL with your API Gateway endpoint:
-    const API_ENDPOINT = 'https://your-api-gateway-url.amazonaws.com/cloud-facts';
+    const API_ENDPOINT = 'arn:aws:execute-api:us-east-1:377521353751:gr64ii0u04/*/GET/fact';
 
     const factEl = document.getElementById('fact');
     const btn = document.getElementById('generate-btn');
@@ -97,7 +97,7 @@
       factEl.textContent = 'Fetching fun fact...';
       btn.disabled = true;
       try {
-        const res = await fetch('arn:aws:execute-api:us-east-1:377521353751:gr64ii0u04/*/GET/fact', { method: 'GET' });
+        const res = await fetch(API_ENDPOINT, { method: 'GET' });
         if (res.ok) {
           const data = await res.json();
           // Adjust property if your API response structure differs
