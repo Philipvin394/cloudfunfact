@@ -4,35 +4,114 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cloud Fun Facts</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: system-ui, sans-serif;
+      color: #10213a;
+      background: linear-gradient(135deg, #e8f4ff, #f5f0ff);
+    }
+
+    main {
+      width: min(100%, 600px);
+      padding: 36px;
+      text-align: center;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 16px 48px #18345c1a;
+    }
+
+    .cloud { font-size: 56px; }
+
+    h1 {
+      margin: 8px 0;
+      font-size: clamp(2rem, 6vw, 3rem);
+    }
+
+    .intro { color: #53657d; }
+
+    #fact {
+      min-height: 90px;
+      margin: 28px 0;
+      padding: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #f1f7ff;
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+
+    button {
+      padding: 14px 22px;
+      border: 0;
+      border-radius: 10px;
+      color: white;
+      background: #1769e0;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: #0d55bd; }
+    button:disabled { opacity: 0.6; cursor: wait; }
+
+    #status {
+      min-height: 24px;
+      margin-top: 14px;
+      color: #53657d;
+    }
+  </style>
 </head>
 <body>
-  <h1>Cloud Fun Facts</h1>
-  <p id="fact">Click the button for a cloud fact.</p>
-  <button id="generate">Generate fun fact</button>
+  <main>
+    <div class="cloud" aria-hidden="true">☁️</div>
+    <h1>Cloud Fun Facts</h1>
+    <p class="intro">A little cloud knowledge, with a chance of humor.</p>
+
+    <p id="fact" aria-live="polite">Click the button to generate a fun fact.</p>
+
+    <button id="generate" type="button">Generate a fun fact</button>
+    <p id="status" role="status"></p>
+  </main>
 
   <script>
-    const apiUrl = "https://00hs9nnbp8.execute-api.us-east-1.amazonaws.com/dev";
+    const API_URL =
+      "https://00hs9nnbp8.execute-api.us-east-1.amazonaws.com/dev/funfact";
 
-    document.getElementById("generate").addEventListener("click", async () => {
-      const button = document.getElementById("generate");
-      const output = document.getElementById("fact");
+    const button = document.getElementById("generate");
+    const factDisplay = document.getElementById("fact");
+    const statusDisplay = document.getElementById("status");
 
+    button.addEventListener("click", async () => {
       button.disabled = true;
-      output.textContent = "Finding a fact…";
+      statusDisplay.textContent = "Finding a fact…";
 
       try {
-        const response = await fetch(apiUrl, {
+        const response = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: "{}"
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Request failed");
 
-        output.textContent = data.enhancedFact || data.fact;
+        if (!response.ok) {
+          throw new Error(data.message || `Request failed (${response.status})`);
+        }
+
+        factDisplay.textContent = data.enhancedFact || data.fact;
+        statusDisplay.textContent = "";
       } catch (error) {
-        output.textContent = "Could not load a fact. Please try again.";
+        factDisplay.textContent = "Sorry, I couldn't load a fact.";
+        statusDisplay.textContent =
+          "Check the API URL and CORS settings, then try again.";
         console.error(error);
       } finally {
         button.disabled = false;
